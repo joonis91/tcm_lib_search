@@ -97,6 +97,109 @@
 
  * 해당 원작자 홈페이지에서 다운로드 받아서, 제가 고전 한문(중국어 번체자)으로 변환한 데이터베이스는  https://drive.google.com/file/d/1O1o3kE9WipB7kn4438Ad_xFhrrE2NVg1/view?usp=drive_link  에서 다운로드 받으실수 있습니다.
  *  원작자가 만든 한약재 사전 파일은 여기에 첨부해 두었습니다.  (역시 간자체를 번자체로 변환함)
- *  
+
+   --------------------------------
+ ## 참고자료 : 한문으로 이루어진 고문헌의 자료수집, 텍스트 분석 및 전처리, 데이터베이스화 하는 과정 ##
+
+ 옛날 한의학 서적을 분석하여 **처방명과 처방내용을 추출하고 데이터베이스화**하는 과정은 여러 단계로 이루어집니다. 이를 위해 **텍스트 처리, 자연어 처리(NLP), 데이터베이스 구축** 등의 기술 스택을 활용해야 합니다. 🚀  
+
+---
+
+### **📌 1. 데이터 수집 및 전처리**
+#### **✅ 기술 스택:** `Python`, `BeautifulSoup`, `PDFMiner`, `OCR (Tesseract)`
+1️⃣ **문헌 수집**  
+   - 한의학 서적은 **PDF, 이미지, HTML, 텍스트 파일** 형태로 존재할 수 있음.  
+   - 웹에서 크롤링(`BeautifulSoup`)을 통해 문헌을 수집하거나, 직접 스캔하여 OCR을 적용할 수도 있음.  
+
+2️⃣ **OCR을 통한 텍스트 변환**  
+   - 이미지 기반 문헌은 **Tesseract OCR**을 사용하여 텍스트로 변환.  
+   - PDF 파일은 **PDFMiner**를 활용하여 텍스트를 추출.  
+
+3️⃣ **텍스트 정제 및 전처리**  
+   - 불필요한 공백, 특수문자 제거 (`re` 라이브러리 활용).  
+   - 한자와 한글이 섞여 있는 경우, **한자만 추출**하는 필터링 적용.  
+
+---
+
+### **📌 2. 처방명 및 처방내용 추출**
+#### **✅ 기술 스택:** `Jieba`, `SpaCy`, `NLTK`, `Regex`
+1️⃣ **텍스트 토큰화 및 형태소 분석**  
+   - **Jieba**를 사용하여 중국어 문장을 단어 단위로 분리.  
+   - **SpaCy** 또는 **NLTK**를 활용하여 처방명과 처방내용을 추출.  
+
+2️⃣ **처방명과 처방내용을 구분하는 규칙 설정**  
+   - 일반적으로 처방명은 **특정 패턴**을 따름 (`XX汤`, `XX散`, `XX丸` 등).  
+   - **정규식(Regex)**을 활용하여 처방명을 자동으로 추출.  
+
+3️⃣ **처방내용 추출**  
+   - 처방명 다음에 오는 **약재 목록 및 용량**을 추출.  
+   - **NER (Named Entity Recognition)**을 활용하여 약재 이름을 식별.  
+
+---
+
+### **📌 3. 데이터베이스 구축**
+#### **✅ 기술 스택:** `SQLite`, `MySQL`, `PostgreSQL`
+1️⃣ **데이터베이스 스키마 설계**  
+   - `prescriptions` 테이블을 생성하여 **처방명과 처방내용을 저장**.  
+   - 예제 테이블 구조:
+     ```sql
+     CREATE TABLE prescriptions (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         name TEXT NOT NULL,
+         ingredients TEXT NOT NULL
+     );
+     ```
+
+2️⃣ **데이터 삽입 및 검색 최적화**  
+   - **FULLTEXT 인덱스**를 활용하여 빠른 검색 지원.  
+   - 예제:
+     ```sql
+     CREATE INDEX idx_prescriptions ON prescriptions(name);
+     ```
+
+---
+
+### **📌 4. 검색 및 활용**
+#### **✅ 기술 스택:** `FastAPI`, `Elasticsearch`, `Flask`
+1️⃣ **API 개발**  
+   - **FastAPI** 또는 **Flask**를 사용하여 검색 API 구축.  
+   - 예제:
+     ```python
+     from flask import Flask, request
+     import sqlite3
+
+     app = Flask(__name__)
+
+     @app.route('/search')
+     def search():
+         query = request.args.get('q')
+         conn = sqlite3.connect("data/prescriptions.db")
+         cursor = conn.cursor()
+         cursor.execute("SELECT * FROM prescriptions WHERE name LIKE ?", (f"%{query}%",))
+         results = cursor.fetchall()
+         conn.close()
+         return {"results": results}
+
+     if __name__ == "__main__":
+         app.run(debug=True)
+     ```
+
+2️⃣ **Elasticsearch를 활용한 고급 검색**  
+   - **자연어 검색**을 지원하여 유사한 처방을 추천.  
+   - **키워드 기반 검색**을 통해 특정 약재가 포함된 처방을 찾을 수 있도록 설정.  
+
+---
+
+### **🚀 최종 요약**
+✅ **데이터 수집** → OCR 및 크롤링을 통해 문헌을 확보  
+✅ **텍스트 전처리** → 한자 필터링 및 정제  
+✅ **처방명 및 처방내용 추출** → NLP 및 정규식을 활용  
+✅ **데이터베이스 구축** → SQLite 또는 MySQL을 사용하여 저장  
+✅ **검색 및 활용** → API 및 Elasticsearch를 통해 검색 기능 제공  
+
+이제 이 과정을 따라가면 **옛날 한의학 서적을 분석하여 처방 데이터베이스를 구축**할 수 있어요! 🚀  
+추가적인 기능이 필요하면 언제든지 알려주세요. 😊
+
+
  
 [common_herbs.txt](https://github.com/user-attachments/files/19824170/common_herbs.txt)
