@@ -84,3 +84,8 @@
 
 이렇게 만들어진 "metadata.sqlite" 데이터베이스를 저는 모두 전통 한문(중국어 번자체)로 변환하였고, 이를 활용해서 웹에서 접근해서 검색하기 좋은 형태로 변환하는 프로젝트를 진행을 했습니다.  해당 데이터베이스는 원 저작자인  https://github.com/wang-shuyu/tcm_lib_search  (wang-shuyu ) 님의 페이지에서 다운로드 받을수 있었습니다.  기타 자세한 내용은 원작자의 해당 페이지에서 확인하시기 바랍니다. 
 
+ * 해당 원작자 홈페이지에서 다운로드 받아서, 제가 고전 한문(중국어 번체자)으로 변환한 데이터베이스는  https://drive.google.com/file/d/1O1o3kE9WipB7kn4438Ad_xFhrrE2NVg1/view?usp=drive_link  에서 다운로드 받으실수 있습니다.
+ *  원작자가 만든 한약재 사전 파일은 여기에 첨부해 두었습니다.  (역시 간자체를 번자체로 변환함)
+ *  
+ 
+[common_herbs.txt](https://github.com/user-attachments/files/19824170/common_herbs.txt)
